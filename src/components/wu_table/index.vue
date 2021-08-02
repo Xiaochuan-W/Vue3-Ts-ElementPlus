@@ -5,12 +5,21 @@
       :stripe="stripe"
       :border="border"
       :size="size"
+      :row-key="rowKey"
       :highlight-current-row="highlight"
+      :header-cell-style="{background:'#eef1f6'}"
       :empty-text="emptyText"
       :span-method="spanMethod"
       @current-change="handleCurrentChange"
       @selection-change="selectChange"
     >
+      <el-table-column
+        v-if="selection"
+        type="selection"
+        :reserve-selection="true"
+        align="center"
+        width="55">
+      </el-table-column>
       <el-table-column
         v-for="(item) in columns"
         :key="item.prop"
@@ -23,15 +32,26 @@
         :min-width="item.minWidth"
         :sortable="item.sortable||false"
       >
-        <template #default="scope">
+        <template v-if="!item.slot" #default="scope">
           <!-- 序号 -->
-          <div v-if="!item.slot&&item.type=='index'">{{ (scope.$index+1)+(searchForm.pageNo-1)*searchForm.pageSize }}</div>
+          <div v-if="item.type=='index'">{{ (scope.$index+1)+(searchForm.pageNo-1)*searchForm.pageSize }}</div>
           <!-- 普通 -->
-          <div v-if="!item.slot&&item.type!='index'" @click="item.click?item.click(JSON.parse(JSON.stringify(scope.row)),scope.$index):'javascript'">
-            {{ scope.row[item.prop] }}
+          <div v-if="item.type!='index'" @click="item.click?item.click(JSON.parse(JSON.stringify(scope.row)),scope.$index):'javascript'">
+            <el-tooltip v-if="item.tooltip" :content="scope.row[item.prop]" placement="top">
+              <div class="tooltip">
+                 <a style="color:#409EFF" v-if="item.click">{{scope.row[item.prop]}}</a>
+                 <span v-else>{{scope.row[item.prop]}}</span>
+              </div>
+            </el-tooltip>
+            <div v-else>
+              <a style="color:#409EFF" v-if="item.click">{{scope.row[item.prop]}}</a>
+              <span v-else>{{scope.row[item.prop]}}</span>
+            </div>
           </div>
           <!-- 自定义 -->
-          <slot v-else :name="item.slot" :row="scope.row" :index="scope.$index" />
+        </template>
+        <template v-else #default="scope">
+          <slot :name="item.slot" :row="scope.row" :index="scope.$index" />
         </template>
 
       </el-table-column>
@@ -52,27 +72,22 @@
         :page-size="searchForm.pageSize"
         :current-page="searchForm.pageNo"
         :layout="pageSetting.layout"
-        :total="pageSetting.total"
+        :total="total"
         :page-sizes="pageSetting.pageSizes"
         @size-change="sizeChange"
         @current-change="currentChange"
       />
     </div>
+    <section v-show="loading" class="loadBox">
+      <img src="@/assets/images/Loading.png" alt="">
+      <div>正在努力加载中。。。</div>
+    </section>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, defineProps, defineEmits } from 'vue';
-interface Column{
-  prop:string;// 对应列内容的字段名
-  label:string;// 标题
-  type:string;// 类型 selection / index / expand
-  align:string;// 对齐方式 left / center / right
-  fixed:string | boolean;// 列是否固定 true / 'left' / 'right'
-  width:string | number;// 对应列的宽度
-  minWidth:string | number;// 对应列最小宽度
-  sortable:string | boolean;// 对应列是否可以排序 true / false / 'custom'
-}
+
 const props = defineProps({
   // 数据
   data: {
@@ -94,6 +109,15 @@ const props = defineProps({
   actionWidth: {
     type: String,
     default: '200px'
+  },
+  rowKey: {
+    type: String,
+    default: ''
+  },
+  // 是否多选
+  selection: {
+    type: Boolean,
+    default: true
   },
   // 是否斑马纹
   stripe: {
@@ -121,20 +145,23 @@ const props = defineProps({
     type: String,
     default: '暂无数据'
   },
-  // 分页
-  pagination: {
-    type: Object,
-    default: {}
+  // 总计
+  total: {
+    type: Number,
+    default: 0
+  },
+  loading:{
+    type:Boolean,
+    default:false
   }
 });
 
-const pageSetting = Object.assign({
+const pageSetting = {
   align: 'flex-end',
   background: false,
-  total: 50,
   layout: 'sizes, prev, pager, next, ->, total',
   pageSizes: [10, 20, 30, 50]
-}, props.pagination);
+};
 const searchForm = reactive({
   pageSize: 10,
   pageNo: 1
@@ -144,6 +171,7 @@ const handleCurrentChange = (currentRow:any, oldCurrentRow:any) => {
   emit('handleCurrentChange', JSON.parse(JSON.stringify(currentRow)), JSON.parse(JSON.stringify(oldCurrentRow)));
 };
 const selectChange = (selection:any) => {
+  console.log('-----------hahaha',selection);
   emit('selectChange', JSON.parse(JSON.stringify(selection)));
 };
 const sortChange = (item:any) => {
@@ -164,5 +192,61 @@ const currentChange = (page:number) => {
 </script>
 
 <style lang="scss" scoped>
-
+::v-deep .el-table__header{
+  background: #f60!important;
+}
+.tooltip{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.loadBox{
+  width: 100vw;
+  height: 100vh;
+  background: rgb(165, 164, 164,.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+    color: #fff;
+  img{
+    width: 128px;
+    height: 128px;
+    margin-bottom: 40px;
+    animation: imgAnima 1s infinite;
+  }
+}
+@keyframes imgAnima {
+  0%{
+    transform: rotate(0deg);
+  }
+  12%{
+    transform: rotate(45deg);
+  }
+  25%{
+    transform: rotate(90deg);
+  }
+  37%{
+    transform: rotate(135deg);
+  }
+  50%{
+    transform: rotate(180deg);
+  }
+  62%{
+    transform: rotate(225deg);
+  }
+  75%{
+    transform: rotate(270deg);
+  }
+  87%{
+    transform: rotate(315deg);
+  }
+  100%{
+    transform: rotate(360deg);
+  }
+}
 </style>

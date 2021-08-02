@@ -5,6 +5,10 @@ import store from '@/store'
 // create an axios instance
 const service = axios.create({
   // withCredentials: true, // send cookies when cross-domain requests
+  baseURL: '/',
+  headers: {
+    'Content-Type': 'application/json;charset=UTF-8'
+  }
   // timeout: 5000 // request timeout
 })
 

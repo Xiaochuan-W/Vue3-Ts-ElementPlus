@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "axios": "0.18.1",
+    "codemirror": "^5.62.2",
     "core-js": "^3.6.5",
     "element-plus": "^1.0.2-beta.51",
     "js-cookie": "2.2.0",

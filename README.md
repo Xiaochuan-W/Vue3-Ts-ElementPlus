@@ -1,3 +1,4 @@
+#
 # vue3-ts-elementplus
 
 ## Project setup
@@ -33,7 +34,7 @@ name: 'router-name' // 设定路由的名字，一定要填写不然使用<keep-
 meta: {
   roles: ['admin', 'user'] // 设置该路由进入的权限，支持多个权限叠加
   title: 'title' // 设置该路由在侧边栏和面包屑中展示的名字
-  icon: 'svg-name' // 设置该路由的图标，支持 svg-class，也支持 el-icon-x element-ui 的 icon
+  icon: 'svg-name' // 设置该路由的图标，支持 svg-class，也支持 el-icon-x element-plus 的 icon
   breadcrumb: false //  如果设置为false，则不会在breadcrumb面包屑中显示(默认 true)
   activeMenu: '/article/list'// 当路由设置了该属性，则会高亮相对应的侧边栏。
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button @click="click">aa</el-button>
+    <CodeMirror />
   </div>
 </template>
 
