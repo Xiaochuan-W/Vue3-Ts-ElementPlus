@@ -101,7 +101,7 @@ const props = defineProps({
     required: true,
     default: []
   },
-  // 列信息
+  // 操作控件
   actions: {
     type: Array,
     default: []

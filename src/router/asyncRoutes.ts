@@ -7,7 +7,8 @@ redirect: 'noRedirect'//当设置 noRedirect 的时候该路由在面包屑导�
 alwaysShow: true//一直显示根路由
 name: 'router-name' // 设定路由的名字，一定要填写不然使用<keep-alive>时会出现各种问题
 meta: {
-  roles: ['admin', 'editor'] // 设置该路由进入的权限，支持多个权限叠加
+  roles: ['admin', 'editor'] // 设置该路由进入的权限，支持多个权限叠加，和router/index.js中filterAsyncRoutesByRoles对应
+  auth: 'user:add'  // 设置改路由进入的权限，在所有路由中必须唯一，和router/index.js中filterAsyncRoutes对应
   title: 'title' // 设置该路由在侧边栏和面包屑中展示的名字
   icon: 'svg-name' // 设置该路由的图标，支持 svg-class，也支持 el-icon-x element-ui 的 icon
   breadcrumb: false //  如果设置为false，则不会在breadcrumb面包屑中显示(默认 true)
@@ -18,13 +19,13 @@ export const asyncRoutes: Array<RouteRecordRaw & NewRecordRaw> = [
     path: '/',
     component: Layout,
     redirect: '/home',
-    meta:{title:'首页',icon:'el-icon-s-unfold'},
+    meta:{title:'首页',icon:'el-icon-s-unfold',auth:'home'},
     children: [
       {
       path: '/home',
       name: 'home',
       component: () => import('@/views/Home/index.vue'),
-      meta: { title: '首页', icon: 'el-icon-user' }
+      meta: { title: '首页', icon: 'el-icon-user',auth:'home1' }
       }
     ]
   },
@@ -39,7 +40,7 @@ export const asyncRoutes: Array<RouteRecordRaw & NewRecordRaw> = [
         path: '/center/index',
         name: 'center',
         component: () => import('@/views/Center/index.vue'),
-        meta: { title: '个人中心', icon: 'product'}
+        meta: { title: '个人中心1', icon: 'product',auth:'center1'}
       },
       {
         path: '/center/index2',
@@ -57,7 +58,7 @@ export const asyncRoutes: Array<RouteRecordRaw & NewRecordRaw> = [
             path: '/center/index4',
             name: 'center4',
             component: () => import('@/views/Center/index4.vue'),
-            meta: { title: '个人中心4', icon: 'el-icon-user'}
+            meta: { title: '个人中心4', icon: 'el-icon-user',auth:'center4'}
           }
         ]
       }

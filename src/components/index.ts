@@ -1,10 +1,10 @@
 import { App } from 'vue';
 import SvgIcon from './SvgIcon/index.vue'
-import wuTable from './wu_table/index.vue'
-import CodeMirror from './CodeMirror/index.vue'
+import WuTable from './WuTable/index.vue'
+import AceEditor from './AceEditor/index.vue'
 
 export default (app: App):void => {
   app.component('SvgIcon', SvgIcon);
-  app.component('wuTable', wuTable);
-  app.component('CodeMirror', CodeMirror);
+  app.component('WuTable', WuTable);
+  app.component('AceEditor', AceEditor);
 };

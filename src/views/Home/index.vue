@@ -1,7 +1,14 @@
 <template>
-  <wu-table :pagination="pagination" :columns="columns" :data="data" selection>
+  <wu-table
+    :pagination="pagination"
+    :columns="columns"
+    :data="data"
+    selection
+  >
     <template #sex="{row}">
-      <el-tag :type="row.sex=='0'?'success':'danger'">{{ row.sex=='0'?'女':'男' }}</el-tag>
+      <el-tag :type="row.sex=='0'?'success':'danger'">
+        {{ row.sex=='0'?'女':'男' }}
+      </el-tag>
     </template>
   </wu-table>
 </template>

@@ -38,17 +38,16 @@ store.commit('user/SET_ROUTES',[...asyncRoutes,...constRoutes]) //不做权限�
         next()
       } else {
         try {
-          // get user info
-          const { roles } = await store.dispatch('user/getInfo')
+          //通过权限过滤路由获取permissions，通过固定角色过滤获取roles
+          const { permissions } = await store.dispatch('user/getInfo')
           // 获取权限路由
-          const accessRoutes = filterAsyncRoutes(asyncRoutes,roles)
+          const accessRoutes = filterAsyncRoutes(asyncRoutes,permissions)
 
           removeRouters = accessRoutes.map(route=>router.addRoute(route))
           store.commit('user/SET_ROUTES',[...accessRoutes,...constRoutes])
 
           next({ ...to, replace: true })
         } catch (error) {
-          // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
           ElMessage.error(error || 'Has Error')
           next(`/login?redirect=${to.path}`)
@@ -74,8 +73,19 @@ router.afterEach(() => {
   NProgress.done()
 })
 
-// 过滤路由
-function filterAsyncRoutes(asyncRoutes:Array<any>,roles:Array<string>) {
+// 通过权限过滤路由  permissions:['user:add','user:list','user:edit','user:del','setting:user','setting:system']
+const filterAsyncRoutes = (asyncRoutes:Array<any>,permissions:Array<string>) => {
+  const newRouters = asyncRoutes.filter((item:any) => (item.meta.auth && permissions.includes(item.meta.auth)) || !item.meta.auth)
+   return newRouters.map((item:any) => {
+       if (item.children) {
+           item.children = filterAsyncRoutes (item.children,permissions)
+       }
+       return item
+   })
+}
+
+// 通过角色过滤路由（角色固定权限）roles:['admin','user']
+function filterAsyncRoutesByRoles(asyncRoutes:Array<any>,roles:Array<string>) {
   const res:Array<any> = []
   asyncRoutes.forEach(route => {
     const tmp = { ...route }
